@@ -19,6 +19,9 @@ import com.saiyan.dbmanga.ui.theme.DragonBallMangaProTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.saiyan.dbmanga.ui.screens.ReaderScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,21 +33,33 @@ class MainActivity : ComponentActivity() {
 
             NavHost(
                 navController = navController,
-                startDestination = "splash_screen" // البداية دائماً من شاشة الترحيب
+                startDestination = "splash_screen"
             ) {
-                // المحطة الأولى
+                // المحطة الأولى: البداية
                 composable("splash_screen") {
                     SplashScreen(onTimeout = {
-                        // عندما ينتهي الوقت، انتقل للشاشة الرئيسية وامسح شاشة البداية من الذاكرة
                         navController.navigate("home_screen") {
                             popUpTo("splash_screen") { inclusive = true }
                         }
                     })
                 }
 
-                // المحطة الثانية
+                // المحطة الثانية: الشاشة الرئيسية
                 composable("home_screen") {
-                    HomeScreen()
+                    HomeScreen(onMangaClick = { volume ->
+                        // عندما يضغط على مجلد، اذهب لشاشة القراءة وخذ الرقم معك!
+                        navController.navigate("reader_screen/$volume")
+                    })
+                }
+
+                // المحطة الثالثة: شاشة القراءة الجديدة
+                composable(
+                    route = "reader_screen/{volume}",
+                    arguments = listOf(navArgument("volume") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    // استخراج رقم المجلد من الرابط (وإذا فشل نعتبره 1)
+                    val volume = backStackEntry.arguments?.getInt("volume") ?: 1
+                    ReaderScreen(volumeNumber = volume)
                 }
             }
         }

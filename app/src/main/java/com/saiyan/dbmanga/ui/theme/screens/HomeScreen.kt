@@ -1,5 +1,7 @@
 package com.saiyan.dbmanga.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,68 +15,63 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import androidx.compose.foundation.background
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
-    // Scaffold هو الهيكل الأساسي (يحتوي على شريط علوي ومساحة بالأسفل)
+// أضفنا onMangaClick لنتمكن من إرسال أمر الانتقال
+fun HomeScreen(onMangaClick: (Int) -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("مكتبة دراغون بول", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E1E1E), // رمادي غامق فخم
-                    titleContentColor = Color(0xFFFF9800) // برتقالي
+                    containerColor = Color(0xFF1E1E1E),
+                    titleContentColor = Color(0xFFFF9800)
                 )
             )
         },
-        containerColor = Color.Black // خلفية التطبيق سوداء
+        containerColor = Color.Black
     ) { paddingValues ->
-
-        // الشبكة الصاروخية لعرض المجلدات
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // نريد عرض عمودين بجانب بعض
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp), // المسافة الأفقية بين المجلدات
-            verticalArrangement = Arrangement.spacedBy(10.dp) // المسافة العمودية
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // نصنع 20 مجلداً وهمياً للتجربة (لاحقاً سنجلبها من السيرفر)
             items(20) { index ->
-                MangaCard(volumeNumber = index + 1)
+                val volumeNum = index + 1
+                // نمرر أمر الضغط إلى البطاقة
+                MangaCard(volumeNumber = volumeNum, onClick = { onMangaClick(volumeNum) })
             }
         }
     }
 }
 
-// تصميم بطاقة المانجا الواحدة
 @Composable
-fun MangaCard(volumeNumber: Int) {
+fun MangaCard(volumeNumber: Int, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp), // زدنا الطول قليلاً ليناسب بوستر المانجا
+            .height(250.dp)
+            .clickable { onClick() }, // السر هنا: جعلنا البطاقة قابلة للضغط!
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C))
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // المحرك الصاروخي لتحميل الصور
             AsyncImage(
-                model = "https://placehold.co/400x600/orange/white?text=DB+Vol+$volumeNumber", // رابط صورة مؤقت
+                model = "https://placehold.co/400x600/orange/white?text=DB+Vol+$volumeNumber",
                 contentDescription = "Manga Cover",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop // قص الصورة لتملأ المساحة بجمال
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
             )
-
-            // صندوق صغير شفاف في الأسفل لعرض رقم المجلد
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .background(Color(0xAA000000)) // خلفية سوداء شفافة
+                    .background(Color(0xAA000000))
                     .padding(8.dp),
                 contentAlignment = Alignment.Center
             ) {
