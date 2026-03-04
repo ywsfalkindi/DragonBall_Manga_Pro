@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import androidx.compose.foundation.background
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,21 +56,35 @@ fun MangaCard(volumeNumber: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp), // طول البطاقة
-        shape = RoundedCornerShape(12.dp), // حواف دائرية أنيقة
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C)) // لون البطاقة
+            .height(250.dp), // زدنا الطول قليلاً ليناسب بوستر المانجا
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C))
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            // لاحقاً سنضع صورة غلاف المانجا هنا بدلاً من النص!
-            Text(
-                text = "المجلد $volumeNumber",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+        Box(modifier = Modifier.fillMaxSize()) {
+            // المحرك الصاروخي لتحميل الصور
+            AsyncImage(
+                model = "https://placehold.co/400x600/orange/white?text=DB+Vol+$volumeNumber", // رابط صورة مؤقت
+                contentDescription = "Manga Cover",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop // قص الصورة لتملأ المساحة بجمال
             )
+
+            // صندوق صغير شفاف في الأسفل لعرض رقم المجلد
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(Color(0xAA000000)) // خلفية سوداء شفافة
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Vol $volumeNumber",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
